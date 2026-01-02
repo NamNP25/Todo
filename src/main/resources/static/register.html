@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Đăng ký - TodoApp</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="container">
+  <h2>Đăng ký tài khoản</h2>
+  <div style="display: flex; flex-direction: column; gap: 10px;">
+    <input type="text" id="username" placeholder="Tên đăng nhập">
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Mật khẩu">
+    <button onclick="handleRegister()">Đăng ký ngay</button>
+  </div>
+  <p id="msg" style="text-align: center; margin-top: 10px;"></p>
+  <a href="index.html" class="nav-link">Quay lại danh sách Todo</a>
+  <a href="welcome.html" class="nav-link">← Quay lại trang chủ</a>
+</div>
+
+<script>
+  async function handleRegister() {
+    const user = {
+      username: document.getElementById('username').value,
+      email: document.getElementById('email').value,
+      password: document.getElementById('password').value
+    };
+
+    try {
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(user)
+      });
+      const data = await res.json();
+      if(res.ok) {
+        alert("Đăng ký thành công!");
+        window.location.href = "index.html";
+      } else {
+        document.getElementById('msg').innerText = "Lỗi: " + (data.message || "Kiểm tra lại dữ liệu");
+      }
+    } catch (err) {
+      document.getElementById('msg').innerText = "Không thể kết nối Server!";
+    }
+  }
+</script>
+</body>
+</html>

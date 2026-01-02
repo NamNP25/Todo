@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Chào mừng đến với TodoApp</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .welcome-container {
+      text-align: center;
+      padding: 50px 20px;
+    }
+    .welcome-title {
+      font-size: 2.5em;
+      color: #2c3e50;
+      margin-bottom: 10px;
+    }
+    .welcome-subtitle {
+      color: #7f8c8d;
+      margin-bottom: 30px;
+    }
+    .auth-buttons {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+    }
+    .btn {
+      text-decoration: none;
+      padding: 15px 30px;
+      border-radius: 5px;
+      font-weight: bold;
+      transition: 0.3s;
+      display: inline-block;
+    }
+    .btn-login {
+      background-color: #007bff;
+      color: white;
+    }
+    .btn-login:hover { background-color: #0056b3; }
+
+    .btn-register {
+      background-color: #28a745;
+      color: white;
+    }
+    .btn-register:hover { background-color: #218838; }
+  </style>
+</head>
+<body>
+<div class="container welcome-container">
+  <h1 class="welcome-title">📌 TodoApp</h1>
+  <p class="welcome-subtitle">Quản lý công việc thông minh, tối ưu hóa thời gian của bạn.</p>
+
+  <div class="auth-buttons">
+    <a href="login.html" class="btn btn-login">Đăng nhập</a>
+    <a href="register.html" class="btn btn-register">Đăng ký tài khoản</a>
+  </div>
+</div>
+
+<script>
+  // Nếu người dùng đã đăng nhập rồi, tự động chuyển họ vào trang chủ Todo
+  if (localStorage.getItem('userData')) {
+    window.location.href = "index.html";
+  }
+</script>
+</body>
+</html>

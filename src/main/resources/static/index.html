@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Todo Pro - Interactive Calendar</title>
+
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css' rel='stylesheet' />
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js'></script>
+    <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/interaction@6.1.8/index.global.min.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
+        :root {
+            --primary: #4361ee; --success: #4cc9f0; --danger: #f72585; --warning: #ffb703;
+            --bg: #f8f9fa; --card-bg: #ffffff; --text-main: #2b2d42; --text-muted: #8d99ae;
+        }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text-main); margin: 0; padding: 20px; }
+        .container { max-width: 1300px; margin: auto; }
+        .header-actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+
+        /* Form Nhập Liệu */
+        .input-group {
+            background: var(--card-bg); padding: 25px; border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin-bottom: 25px;
+        }
+        .input-row { display: grid; grid-template-columns: 1fr 180px 140px; gap: 10px; margin-bottom: 10px; }
+        input, textarea { padding: 12px; border: 1px solid #edf2f4; border-radius: 10px; outline: none; font-family: inherit; font-size: 0.95em; }
+        input:focus { border-color: var(--primary); }
+
+        /* Layout Grid */
+        .main-content { display: grid; grid-template-columns: 1fr 480px; gap: 30px; align-items: start; }
+        @media (max-width: 1000px) { .main-content { grid-template-columns: 1fr; } }
+
+        /* Calendar Styling */
+        #calendar {
+            background: white; padding: 20px; border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #eee;
+        }
+        .fc-daygrid-day { cursor: pointer; transition: 0.2s; }
+        .fc-daygrid-day:hover { background: rgba(67, 97, 238, 0.05) !important; }
+        .fc-event { cursor: pointer; padding: 2px 4px; font-size: 0.85em; }
+
+        /* Toolbar & Filters */
+        .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; gap: 15px; }
+        .filter-btn { padding: 8px 18px; border-radius: 20px; border: none; cursor: pointer; background: #e9ecef; font-weight: 600; color: var(--text-muted); }
+        .filter-btn.active { background: var(--primary); color: white; }
+        .search-box { flex-grow: 1; max-width: 300px; border-radius: 20px; padding: 8px 15px; border: 1px solid #ddd; outline: none; }
+
+        /* Todo Cards */
+        #todo-list { list-style: none; padding: 0; margin: 0; }
+        .todo-card {
+            background: var(--card-bg); border-radius: 12px; padding: 18px; margin-bottom: 15px;
+            display: flex; justify-content: space-between; align-items: center;
+            border-left: 5px solid var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+            transition: transform 0.2s;
+        }
+        .todo-card:hover { transform: translateY(-3px); }
+        .todo-card.done { opacity: 0.6; background: #f1f3f5; border-left-color: var(--text-muted); }
+
+        .todo-info { flex-grow: 1; }
+        .todo-title { font-weight: 600; font-size: 1.1em; display: block; margin-bottom: 4px; }
+        .todo-desc { font-size: 0.9em; color: var(--text-muted); display: block; }
+        .todo-meta { font-size: 0.8em; color: var(--primary); font-weight: 700; margin-top: 10px; display: block; }
+
+        .actions { display: flex; gap: 8px; }
+        .btn-icon { width: 35px; height: 35px; border-radius: 10px; border: none; cursor: pointer; font-size: 1.1em; transition: 0.2s; }
+        .btn-icon:hover { transform: scale(1.1); }
+        .todo-text-done { text-decoration: line-through; color: var(--text-muted); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-actions">
+        <div>
+            <h2 style="margin:0;">🎯 My ToDoList</h2>
+            <div style="font-size: 0.9em; color: var(--text-muted);">Chào mừng, <span id="display-name" style="color:var(--primary); font-weight:600;">...</span></div>
+        </div>
+        <button onclick="logout()" class="filter-btn" style="background:var(--text-main); color:white;">Đăng xuất</button>
+    </div>
+
+    <div class="input-group">
+        <div class="input-row">
+            <input type="text" id="todo-title" placeholder="Hôm nay bạn cần làm gì?">
+            <input type="date" id="todo-duedate">
+            <input type="time" id="todo-duetime">
+        </div>
+        <textarea id="todo-desc" placeholder="Thêm ghi chú công việc..." rows="1" style="width:100%; box-sizing:border-box;"></textarea>
+        <button onclick="addNewTodo()" style="width: 100%; margin-top: 15px; background: var(--primary); color: white; border: none; padding: 12px; border-radius: 10px; cursor: pointer; font-weight: 600;">+ THÊM CÔNG VIỆC</button>
+    </div>
+
+    <div class="toolbar">
+        <div style="display:flex; gap:10px;">
+            <button class="filter-btn active" id="btn-all" onclick="setFilter('ALL', this)">Tất cả</button>
+            <button class="filter-btn" id="btn-today" onclick="setFilter('TODAY', this)">Hôm nay</button>
+            <button class="filter-btn" onclick="setFilter('DONE', this)">Đã xong</button>
+        </div>
+        <input type="text" id="search-input" class="search-box" placeholder="🔍 Tìm kiếm nhanh..." oninput="filterTodos()">
+    </div>
+
+    <div class="main-content">
+        <div id="todo-container">
+            <div id="filter-status" style="margin-bottom:10px; font-weight:600; color:var(--primary);"></div>
+            <ul id="todo-list"></ul>
+        </div>
+
+        <div id="calendar-container">
+            <div id="calendar"></div>
+            <p style="font-size: 0.8em; color: var(--text-muted); text-align: center; margin-top: 10px;">💡 Nhấn vào một ngày trên lịch để xem việc của ngày đó.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    let allTodos = [];
+    let currentFilter = 'ALL';
+    let calendar;
+    const userData = JSON.parse(localStorage.getItem('userData'));
+
+    if (!userData) window.location.href = "login.html";
+    else document.getElementById('display-name').innerText = userData.username;
+
+    // Khởi tạo Lịch
+    document.addEventListener('DOMContentLoaded', function() {
+        const calendarEl = document.getElementById('calendar');
+        calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            locale: 'vi',
+            height: 'auto',
+            headerToolbar: { left: 'prev,next', center: 'title', right: 'today' },
+            events: [],
+            // Tính năng bạn yêu cầu: Nhấn vào ngày
+            dateClick: function(info) {
+                filterBySpecificDate(info.dateStr);
+            }
+        });
+        calendar.render();
+        fetchTodos();
+    });
+
+    async function fetchTodos() {
+        try {
+            const res = await fetch(`/todos?userId=${userData.id}`);
+            const data = await res.json();
+            allTodos = data.content;
+            updateCalendar();
+            filterTodos();
+        } catch (err) { console.error(err); }
+    }
+
+    function updateCalendar() {
+        const events = allTodos.filter(t => t.dueDate).map(t => ({
+            title: t.title,
+            start: t.dueDate,
+            backgroundColor: t.status === 'DONE' ? '#ced4da' : '#4361ee',
+            borderColor: 'transparent'
+        }));
+        calendar.removeAllEvents();
+        calendar.addEventSource(events);
+    }
+
+    // Lọc theo ngày được chọn trên lịch
+    function filterBySpecificDate(dateStr) {
+        currentFilter = 'SPECIFIC_DATE';
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('filter-status').innerHTML = `🔍 Kết quả cho ngày: ${dateStr} <span onclick="fetchTodos(); document.getElementById('btn-all').click();" style="cursor:pointer; font-weight:normal; text-decoration:underline; margin-left:10px;">[Xem tất cả]</span>`;
+
+        const filtered = allTodos.filter(t => t.dueDate === dateStr);
+        renderList(filtered);
+    }
+
+    function setFilter(f, btn) {
+        currentFilter = f;
+        document.getElementById('filter-status').innerText = '';
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        filterTodos();
+    }
+
+    function filterTodos() {
+        if (currentFilter === 'SPECIFIC_DATE') return; // Không can thiệp nếu đang lọc theo lịch
+
+        const query = document.getElementById('search-input').value.toLowerCase();
+        const today = new Date().toISOString().split('T')[0];
+
+        const filtered = allTodos.filter(t => {
+            const matchSearch = t.title.toLowerCase().includes(query);
+            if (currentFilter === 'DONE') return matchSearch && t.status === 'DONE';
+            if (currentFilter === 'TODAY') return matchSearch && t.dueDate === today;
+            return matchSearch;
+        });
+        renderList(filtered);
+    }
+
+    function renderList(todos) {
+        const list = document.getElementById('todo-list');
+        list.innerHTML = todos.length === 0 ? '<div style="text-align:center; padding:50px; color:#ccc;">Không có công việc nào trong danh sách.</div>' : '';
+
+        todos.forEach(t => {
+            const isDone = t.status === 'DONE';
+            list.innerHTML += `
+                <li class="todo-card ${isDone ? 'done' : ''}">
+                    <div class="todo-info">
+                        <span class="todo-title ${isDone ? 'todo-text-done' : ''}">${t.title}</span>
+                        <span class="todo-desc">${t.description || 'Chưa có mô tả'}</span>
+                        <span class="todo-meta">🗓️ ${t.dueDate || 'No date'} ${t.dueTime ? '🕒 ' + t.dueTime : ''}</span>
+                    </div>
+                    <div class="actions">
+                        <button class="btn-icon" style="background:#e7f5ff; color:var(--primary)" onclick="toggleStatus(${t.id}, '${t.status}', \`${t.title}\`, \`${t.description || ''}\`, '${t.dueDate || ''}', '${t.dueTime || ''}')">${isDone ? '↩️' : '✅'}</button>
+                        <button class="btn-icon" style="background:#fff0f6; color:var(--danger)" onclick="deleteTodo(${t.id})">🗑️</button>
+                    </div>
+                </li>`;
+        });
+    }
+
+    async function addNewTodo() {
+        const title = document.getElementById('todo-title').value;
+        const dueDate = document.getElementById('todo-duedate').value;
+        const dueTime = document.getElementById('todo-duetime').value;
+        const description = document.getElementById('todo-desc').value;
+        if(!title.trim()) return;
+
+        await fetch('/todos', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ title, description, dueDate: dueDate || null, dueTime: dueTime || null, userId: userData.id, status: 'TODO' })
+        });
+        location.reload();
+    }
+
+    async function toggleStatus(id, status, title, desc, date, time) {
+        const newStatus = status === 'DONE' ? 'TODO' : 'DONE';
+        await fetch(`/todos/${id}`, {
+            method: 'PUT',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ title, description: desc, dueDate: date || null, dueTime: time || null, status: newStatus, userId: userData.id })
+        });
+        fetchTodos();
+    }
+
+    async function deleteTodo(id) {
+        if(confirm("Xóa công việc này nhé?")) {
+            await fetch(`/todos/${id}`, { method: 'DELETE' });
+            fetchTodos();
+        }
+    }
+
+    function logout() { localStorage.removeItem('userData'); window.location.href = "login.html"; }
+</script>
+</body>
+</html>

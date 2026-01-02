@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Đăng nhập</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="container">
+  <h2>Đăng nhập</h2>
+  <input type="text" id="u" placeholder="Tên đăng nhập">
+  <input type="password" id="p" placeholder="Mật khẩu">
+  <button onclick="doLogin()">Vào hệ thống</button>
+  <a href="register.html" class="nav-link">Chưa có tài khoản? Đăng ký</a>
+  <a href="welcome.html" class="nav-link">← Quay lại trang chủ</a>
+</div>
+<script>
+  async function doLogin() {
+    const res = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({username: u.value, password: p.value})
+    });
+    if(res.ok) {
+      const user = await res.json();
+      localStorage.setItem('userData', JSON.stringify(user)); // Lưu thông tin user
+      window.location.href = "index.html"; // Chuyển sang trang Todo
+    } else {
+      alert(await res.text());
+    }
+  }
+</script>
+</body>
+</html>
