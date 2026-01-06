@@ -1,19 +1,9 @@
-package com.example.todo.services;
+package com.example.todo.service;
 
-import com.example.todo.dtos.requestDTO.UserRequestDTO;
-import com.example.todo.dtos.responseDTO.UserResponseDTO;
 import com.example.todo.entity.User;
 import com.example.todo.repository.UserRepository;
 import org.springframework.stereotype.Service;
-
-/**
- *  Xử lý logic - nghiệp vụ
- *  Nghiệp vụ: Register, Login, Update Profile, Change Password, ...
- *
- *  DI: Dependency Injection
- *
- *  -> UserService phụ thuộc UserRepository để lưu dữ liệu người dùng xuống db
- * */
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -24,32 +14,11 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public UserResponseDTO register(UserRequestDTO dto) {
-
-        //(1)Map dữ liệu từ UserRequestDTO -> User entity
-        User user = mappingRequestToEntity(dto);
-
-        //(2) luu user entity xuống db thông qua repository
-        User saved = userRepository.save(user);
-
-        //(3) Map dữ liệu từ User entity -> UserResponseDTO
-        UserResponseDTO responseDTO = mappingEntityToResponse(saved);
-        return responseDTO;
+    public User register(User user) {
+        return userRepository.save(user);
     }
 
-    private User mappingRequestToEntity (UserRequestDTO dto) {
-        User user = new User();
-        user.setUsername(dto.getUsername());
-        user.setPassword(dto.getPassword());
-        user.setEmail(dto.getEmail());
-        user.setRole(dto.getRole());
-        return user;
-    }
-
-    private UserResponseDTO mappingEntityToResponse (User user) {
-        UserResponseDTO responseDTO = new UserResponseDTO();
-        responseDTO.setUsername(user.getUsername());
-        responseDTO.setEmail(user.getEmail());
-        return responseDTO;
+    public Optional<User> findByUsername(String username) {
+        return userRepository.findByUsername(username);
     }
 }
