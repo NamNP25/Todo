@@ -1,7 +1,10 @@
 package com.example.todo.controller;
 
+import com.example.todo.dtos.requestDTO.UserRequestDTO;
+import com.example.todo.dtos.responseDTO.UserResponseDTO;
 import com.example.todo.entity.User;
 import com.example.todo.repository.UserRepository;
+import com.example.todo.services.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,19 +15,24 @@ import java.util.Optional;
 public class AuthController {
 
     private final UserRepository userRepository;
+    private final UserService userService;
 
-    public AuthController(UserRepository userRepository) {
+    public AuthController(UserRepository userRepository, UserService userService) {
         this.userRepository = userRepository;
+        this.userService = userService;
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody User user) {
+    public ResponseEntity<?> register(@RequestBody UserRequestDTO userRequestDTO) {
         try {
-            if (user.getUsername() == null || user.getEmail() == null || user.getPassword() == null) {
+            if (userRequestDTO.getUsername() == null || userRequestDTO.getEmail() == null || userRequestDTO.getPassword() == null) {
                 return ResponseEntity.badRequest().body("Lỗi: username, email và password là bắt buộc!");
             }
-            User savedUser = userRepository.save(user);
-            return ResponseEntity.ok(savedUser);
+
+            // Gọi đến UserService để xử lý logic
+            UserResponseDTO register = userService.register(userRequestDTO);
+
+            return ResponseEntity.ok(register);
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Lỗi hệ thống: " + e.getMessage());
         }

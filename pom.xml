@@ -22,7 +22,7 @@
 	<description>Todo CRUD with Spring Boot</description>
 
 	<properties>
-		<java.version>21</java.version>
+		<java.version>17</java.version>
 	</properties>
 
 	<dependencies>
@@ -58,13 +58,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
 			<scope>runtime</scope>
-		</dependency>
-
-		<!-- Test -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
 		</dependency>
 
 	</dependencies>

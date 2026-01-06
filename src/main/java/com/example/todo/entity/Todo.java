@@ -4,6 +4,15 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+// DTO: Data Transfer Object - đối tượng chuyển dữ liệu
+// Entity: đối tượng ánh xạ bảng trong CSDL
+/***
+ *
+ * FE -> BE: JSON -> DTO (Xử lý logic ) -> Entity -> Repository (save)-> CSDL
+ *
+ */
+
+
 @Entity
 @Table(name = "todos")
 public class Todo {
