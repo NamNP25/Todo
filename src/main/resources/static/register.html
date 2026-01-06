@@ -36,7 +36,7 @@
       const data = await res.json();
       if(res.ok) {
         alert("Đăng ký thành công!");
-        window.location.href = "index.html";
+
       } else {
         document.getElementById('msg').innerText = "Lỗi: " + (data.message || "Kiểm tra lại dữ liệu");
       }

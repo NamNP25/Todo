@@ -54,4 +54,19 @@ public class AuthController {
         }
         return ResponseEntity.status(404).body("Không tìm thấy người dùng này!");
     }
+
+    /*
+    {
+       message: "Sai mật khẩu rồi bạn ơi!",
+       data: {
+//           username: "john_doe",
+//           email: user1@gmail.com"
+            null
+       }
+       responseTime: "2026-01-10T10:10:10Z"
+    }
+
+    **/
+
+
 }
