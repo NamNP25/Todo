@@ -31,3 +31,14 @@ build/
 
 ### VS Code ###
 .vscode/
+appsettings.json
+*.yaml
+*.yml
+*.env
+*.local
+*.secret
+*.config.js
+*.config.cjs
+*.config.ts
+*.config.mjs
+

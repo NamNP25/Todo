@@ -1,4 +1,4 @@
-package com.example.todo.dtos.requestDTO;
+package com.example.todo.dtos;
 
 public class LoginRequestDTO {
 

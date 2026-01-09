@@ -22,6 +22,17 @@ public class AuthController {
         this.userService = userService;
     }
 
+    /**
+     * Client -> gửi Request lên
+     *
+     * BE  -> Validate: dữ liệu hợp lệ (có giá trị không,...)
+     *
+     * xử lí logic nghiệp vụ ở Service layer: Lỗi nghiệp vụ | Lỗi về dữ liệu (không trùng username, email)
+     *
+     * trả ra cho Controller -> trả về cho Client
+     *
+     * */
+
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody UserRequestDTO userRequestDTO) {
         try {
@@ -41,18 +52,10 @@ public class AuthController {
     // --- THÊM HÀM LOGIN NÀY ---
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody User loginRequest) {
-        Optional<User> userOpt = userRepository.findByUsername(loginRequest.getUsername());
 
-        if (userOpt.isPresent()) {
-            User user = userOpt.get();
-            // Kiểm tra mật khẩu
-            if (user.getPassword().equals(loginRequest.getPassword())) {
-                return ResponseEntity.ok(user); // Trả về thông tin user nếu đúng pass
-            } else {
-                return ResponseEntity.status(401).body("Sai mật khẩu rồi bạn ơi!");
-            }
-        }
-        return ResponseEntity.status(404).body("Không tìm thấy người dùng này!");
+        /**Gọi đến Login() ở Service layer - Chuyên xử lý logic nghiệp vụ*/
+        UserResponseDTO user = userService.login(loginRequest);
+        return ResponseEntity.ok(user); // Trả về thông tin user nếu đúng pass
     }
 
     /*

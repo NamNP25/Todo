@@ -36,7 +36,8 @@ public class UserService {
         UserResponseDTO responseDTO = mappingEntityToResponse(saved); //FE  chỉ nhận:  username + email
         return responseDTO;
     }
-    public UserResponseDTO login(LoginRequestDTO dto) {
+
+    public UserResponseDTO login(User dto) {
 
         // Bước (1): tìm user theo username
         User user = userRepository.findByUsername(dto.getUsername())
@@ -50,7 +51,6 @@ public class UserService {
         // Bước (3): map Entity -> ResponseDTO
         return mappingEntityToResponse(user);
     }
-
 
     private User mappingRequestToEntity (UserRequestDTO dto) {
         User user = new User();
