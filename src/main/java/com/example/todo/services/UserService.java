@@ -36,6 +36,21 @@ public class UserService {
         UserResponseDTO responseDTO = mappingEntityToResponse(saved); //FE  chỉ nhận:  username + email
         return responseDTO;
     }
+    public UserResponseDTO login(LoginRequestDTO dto) {
+
+        // Bước (1): tìm user theo username
+        User user = userRepository.findByUsername(dto.getUsername())
+                .orElseThrow(() -> new RuntimeException("Username không tồn tại"));
+
+        // Bước (2): kiểm tra password
+        if (!user.getPassword().equals(dto.getPassword())) {
+            throw new RuntimeException("Password không đúng");
+        }
+
+        // Bước (3): map Entity -> ResponseDTO
+        return mappingEntityToResponse(user);
+    }
+
 
     private User mappingRequestToEntity (UserRequestDTO dto) {
         User user = new User();
